@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.supply.mapper.SupplyMapper">
+
+    <resultMap id="SupplyResultMap" type="com.example.supply.entity.Supply">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="quantity" column="quantity"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="category" column="category"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="SupplyResultMap">
+        SELECT id, name, quantity, unit_price, category, created_at, updated_at
+        FROM supplies
+        ORDER BY id DESC
+    </select>
+
+    <select id="findById" resultMap="SupplyResultMap">
+        SELECT id, name, quantity, unit_price, category, created_at, updated_at
+        FROM supplies
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.supply.entity.Supply"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO supplies (name, quantity, unit_price, category)
+        VALUES (#{name}, #{quantity}, #{unitPrice}, #{category})
+    </insert>
+
+    <update id="update" parameterType="com.example.supply.entity.Supply">
+        UPDATE supplies
+        SET name = #{name},
+            quantity = #{quantity},
+            unit_price = #{unitPrice},
+            category = #{category},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM supplies WHERE id = #{id}
+    </delete>
+
+    <select id="findByCategory" resultMap="SupplyResultMap">
+        SELECT id, name, quantity, unit_price, category, created_at, updated_at
+        FROM supplies
+        WHERE category = #{category}
+        ORDER BY id DESC
+    </select>
+
+</mapper>

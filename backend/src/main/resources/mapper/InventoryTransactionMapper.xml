@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.supply.mapper.InventoryTransactionMapper">
+
+    <resultMap id="InventoryTransactionResultMap" type="com.example.supply.entity.InventoryTransaction">
+        <id property="id" column="id"/>
+        <result property="supplyId" column="supply_id"/>
+        <result property="type" column="type"/>
+        <result property="quantity" column="quantity"/>
+        <result property="transactionDate" column="transaction_date"/>
+        <result property="note" column="note"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="InventoryTransactionResultMap">
+        SELECT id, supply_id, type, quantity, transaction_date, note
+        FROM inventory_transactions
+        ORDER BY transaction_date DESC
+    </select>
+
+    <select id="findById" resultMap="InventoryTransactionResultMap">
+        SELECT id, supply_id, type, quantity, transaction_date, note
+        FROM inventory_transactions
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.supply.entity.InventoryTransaction"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO inventory_transactions (supply_id, type, quantity, note)
+        VALUES (#{supplyId}, #{type}, #{quantity}, #{note})
+    </insert>
+
+    <select id="findBySupplyId" resultMap="InventoryTransactionResultMap">
+        SELECT id, supply_id, type, quantity, transaction_date, note
+        FROM inventory_transactions
+        WHERE supply_id = #{supplyId}
+        ORDER BY transaction_date DESC
+    </select>
+
+</mapper>
