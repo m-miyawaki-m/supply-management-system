@@ -1,0 +1,168 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "."
+    },
+    {
+      "name": "Backend (Spring Boot)",
+      "path": "backend"
+    },
+    {
+      "name": "Frontend (React)",
+      "path": "frontend"
+    },
+    {
+      "name": "Mock Server",
+      "path": "mock-server"
+    }
+  ],
+  "settings": {
+    // Java Language Server設定
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.import.gradle.enabled": true,
+    "java.import.gradle.wrapper.enabled": true,
+
+    // Spring Boot設定
+    "spring-boot.ls.boot-version-validation": false,
+
+    // ファイル除外設定
+    "files.exclude": {
+      "**/.git": false,
+      "**/.gradle": true,
+      "**/build": true,
+      "**/node_modules": true,
+      "**/.DS_Store": true
+    },
+
+    // 検索除外設定
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/build": true,
+      "**/.gradle": true,
+      "**/dist": true
+    },
+
+    // エディタ設定
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+
+    // 言語別設定
+    "[java]": {
+      "editor.defaultFormatter": "redhat.java",
+      "editor.tabSize": 4,
+      "editor.insertSpaces": true
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.tabSize": 2
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.tabSize": 2
+    },
+
+    // TypeScript設定
+    "typescript.tsdk": "frontend/node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+
+    // ターミナル設定
+    "terminal.integrated.cwd": "${workspaceFolder}"
+  },
+  "extensions": {
+    "recommendations": [
+      // Java & Spring Boot
+      "vscjava.vscode-java-pack",
+      "vmware.vscode-spring-boot",
+      "vscjava.vscode-spring-boot-dashboard",
+      "vscjava.vscode-spring-initializr",
+
+      // TypeScript & React
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "dsznajder.es7-react-js-snippets",
+
+      // Git
+      "eamodio.gitlens",
+
+      // その他便利な拡張機能
+      "streetsidesoftware.code-spell-checker",
+      "gruntfuggly.todo-tree",
+      "oderwat.indent-rainbow"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "java",
+        "name": "Spring Boot - SupplyApplication",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/backend",
+        "mainClass": "com.example.supply.SupplyApplication",
+        "projectName": "supply",
+        "args": "",
+        "envFile": "${workspaceFolder}/backend/.env"
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Backend: Build",
+        "type": "shell",
+        "command": "./gradlew build",
+        "options": {
+          "cwd": "${workspaceFolder}/backend"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Backend: Run",
+        "type": "shell",
+        "command": "./gradlew bootRun",
+        "options": {
+          "cwd": "${workspaceFolder}/backend"
+        },
+        "group": {
+          "kind": "test",
+          "isDefault": false
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Frontend: Dev Server",
+        "type": "shell",
+        "command": "npm run dev",
+        "options": {
+          "cwd": "${workspaceFolder}/frontend"
+        },
+        "group": {
+          "kind": "test",
+          "isDefault": false
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Mock Server: Start",
+        "type": "shell",
+        "command": "npm run mock",
+        "options": {
+          "cwd": "${workspaceFolder}/mock-server"
+        },
+        "group": {
+          "kind": "test",
+          "isDefault": false
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
