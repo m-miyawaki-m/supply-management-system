@@ -1,0 +1,580 @@
+openapi: 3.0.3
+info:
+  title: Supply Management System API
+  description: 補給管理システムのREST API仕様
+  version: 1.0.0
+  contact:
+    name: Supply Management Team
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: http://localhost:4010
+    description: Mock server (Prism)
+
+tags:
+  - name: supplies
+    description: 補給品管理
+  - name: inventory
+    description: 在庫管理
+
+paths:
+  /api/supplies:
+    get:
+      summary: 補給品一覧取得
+      description: 登録されているすべての補給品を取得します
+      tags:
+        - supplies
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supply'
+              examples:
+                success:
+                  value:
+                    - id: 1
+                      name: ノートPC
+                      quantity: 10
+                      unitPrice: 150000
+                      category: 電子機器
+                      createdAt: '2024-01-01T00:00:00Z'
+                      updatedAt: '2024-01-01T00:00:00Z'
+                    - id: 2
+                      name: マウス
+                      quantity: 50
+                      unitPrice: 2000
+                      category: 電子機器
+                      createdAt: '2024-01-02T00:00:00Z'
+                      updatedAt: '2024-01-02T00:00:00Z'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: 補給品登録
+      description: 新しい補給品を登録します
+      tags:
+        - supplies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplyFormData'
+            examples:
+              laptop:
+                value:
+                  name: ノートPC
+                  quantity: 10
+                  unitPrice: 150000
+                  category: 電子機器
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supply'
+              examples:
+                success:
+                  value:
+                    id: 3
+                    name: ノートPC
+                    quantity: 10
+                    unitPrice: 150000
+                    category: 電子機器
+                    createdAt: '2024-01-03T00:00:00Z'
+                    updatedAt: '2024-01-03T00:00:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/supplies/{id}:
+    get:
+      summary: 補給品詳細取得
+      description: 指定されたIDの補給品の詳細を取得します
+      tags:
+        - supplies
+      parameters:
+        - $ref: '#/components/parameters/SupplyId'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supply'
+              examples:
+                success:
+                  value:
+                    id: 1
+                    name: ノートPC
+                    quantity: 10
+                    unitPrice: 150000
+                    category: 電子機器
+                    createdAt: '2024-01-01T00:00:00Z'
+                    updatedAt: '2024-01-01T00:00:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: 補給品更新
+      description: 指定されたIDの補給品を更新します
+      tags:
+        - supplies
+      parameters:
+        - $ref: '#/components/parameters/SupplyId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupplyFormData'
+            examples:
+              update:
+                value:
+                  name: ノートPC（更新版）
+                  quantity: 15
+                  unitPrice: 140000
+                  category: 電子機器
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supply'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    delete:
+      summary: 補給品削除
+      description: 指定されたIDの補給品を削除します
+      tags:
+        - supplies
+      parameters:
+        - $ref: '#/components/parameters/SupplyId'
+      responses:
+        '204':
+          description: 削除成功
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/supplies/import:
+    post:
+      summary: CSVインポート
+      description: CSVファイルから補給品データを一括登録します
+      tags:
+        - supplies
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSVファイル
+      responses:
+        '200':
+          description: インポート成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 10件のデータをインポートしました
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/supplies/export:
+    get:
+      summary: Excelエクスポート
+      description: 補給品データをExcelファイル形式でエクスポートします
+      tags:
+        - supplies
+      responses:
+        '200':
+          description: エクスポート成功
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/inventory:
+    get:
+      summary: 在庫一覧取得
+      description: すべての在庫情報を取得します
+      tags:
+        - inventory
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Supply'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/inventory/in:
+    post:
+      summary: 入庫登録
+      description: 補給品の入庫を登録します
+      tags:
+        - inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryTransactionRequest'
+            examples:
+              inbound:
+                value:
+                  supplyId: 1
+                  type: IN
+                  quantity: 5
+                  note: 追加発注分
+      responses:
+        '201':
+          description: 入庫登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryTransaction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/inventory/out:
+    post:
+      summary: 出庫登録
+      description: 補給品の出庫を登録します
+      tags:
+        - inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryTransactionRequest'
+            examples:
+              outbound:
+                value:
+                  supplyId: 1
+                  type: OUT
+                  quantity: 3
+                  note: 営業部へ配布
+      responses:
+        '201':
+          description: 出庫登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryTransaction'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/inventory/history:
+    get:
+      summary: 入出庫履歴取得
+      description: 入出庫の履歴を取得します
+      tags:
+        - inventory
+      parameters:
+        - name: supplyId
+          in: query
+          description: 補給品IDでフィルタ
+          required: false
+          schema:
+            type: integer
+        - name: type
+          in: query
+          description: トランザクションタイプでフィルタ
+          required: false
+          schema:
+            type: string
+            enum: [IN, OUT]
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryTransaction'
+              examples:
+                success:
+                  value:
+                    - id: 1
+                      supplyId: 1
+                      type: IN
+                      quantity: 10
+                      transactionDate: '2024-01-01T10:00:00Z'
+                      note: 初期在庫
+                    - id: 2
+                      supplyId: 1
+                      type: OUT
+                      quantity: 3
+                      transactionDate: '2024-01-02T14:00:00Z'
+                      note: 営業部へ配布
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  schemas:
+    Supply:
+      type: object
+      required:
+        - id
+        - name
+        - quantity
+        - unitPrice
+        - category
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 補給品ID
+          example: 1
+        name:
+          type: string
+          description: 品名
+          example: ノートPC
+        quantity:
+          type: integer
+          description: 数量
+          example: 10
+        unitPrice:
+          type: number
+          format: double
+          description: 単価
+          example: 150000
+        category:
+          type: string
+          description: カテゴリ
+          example: 電子機器
+        createdAt:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: '2024-01-01T00:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: '2024-01-01T00:00:00Z'
+
+    SupplyFormData:
+      type: object
+      required:
+        - name
+        - quantity
+        - unitPrice
+        - category
+      properties:
+        name:
+          type: string
+          description: 品名
+          minLength: 1
+          maxLength: 100
+          example: ノートPC
+        quantity:
+          type: integer
+          description: 数量
+          minimum: 0
+          example: 10
+        unitPrice:
+          type: number
+          format: double
+          description: 単価
+          minimum: 0
+          example: 150000
+        category:
+          type: string
+          description: カテゴリ
+          minLength: 1
+          maxLength: 50
+          example: 電子機器
+
+    InventoryTransaction:
+      type: object
+      required:
+        - id
+        - supplyId
+        - type
+        - quantity
+        - transactionDate
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: トランザクションID
+          example: 1
+        supplyId:
+          type: integer
+          format: int64
+          description: 補給品ID
+          example: 1
+        type:
+          type: string
+          enum: [IN, OUT]
+          description: トランザクションタイプ（IN=入庫、OUT=出庫）
+          example: IN
+        quantity:
+          type: integer
+          description: 数量
+          minimum: 1
+          example: 5
+        transactionDate:
+          type: string
+          format: date-time
+          description: 取引日時
+          example: '2024-01-01T10:00:00Z'
+        note:
+          type: string
+          description: 備考
+          example: 追加発注分
+
+    InventoryTransactionRequest:
+      type: object
+      required:
+        - supplyId
+        - type
+        - quantity
+      properties:
+        supplyId:
+          type: integer
+          format: int64
+          description: 補給品ID
+          example: 1
+        type:
+          type: string
+          enum: [IN, OUT]
+          description: トランザクションタイプ（IN=入庫、OUT=出庫）
+          example: IN
+        quantity:
+          type: integer
+          description: 数量
+          minimum: 1
+          example: 5
+        note:
+          type: string
+          description: 備考
+          example: 追加発注分
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: エラーコード
+          example: E001
+        message:
+          type: string
+          description: エラーメッセージ
+          example: 必須項目が未入力です
+        details:
+          type: array
+          description: エラー詳細
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: name
+              message:
+                type: string
+                example: 品名は必須です
+
+  parameters:
+    SupplyId:
+      name: id
+      in: path
+      description: 補給品ID
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+
+  responses:
+    BadRequest:
+      description: リクエストが不正です
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            validation-error:
+              value:
+                code: E001
+                message: バリデーションエラー
+                details:
+                  - field: name
+                    message: 品名は必須です
+                  - field: quantity
+                    message: 数量は0以上である必要があります
+
+    NotFound:
+      description: リソースが見つかりません
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            not-found:
+              value:
+                code: E404
+                message: 指定されたIDの補給品が見つかりません
+
+    InternalServerError:
+      description: サーバー内部エラー
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            server-error:
+              value:
+                code: E500
+                message: サーバー内部エラーが発生しました

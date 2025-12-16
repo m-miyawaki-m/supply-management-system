@@ -1,0 +1,13 @@
+{
+  "name": "supply-mock-server",
+  "version": "1.0.0",
+  "description": "Mock server for Supply Management System API using Stoplight Prism",
+  "scripts": {
+    "mock": "prism mock ../openapi.yaml --host 0.0.0.0 --port 4010",
+    "mock:dynamic": "prism mock ../openapi.yaml --host 0.0.0.0 --port 4010 --dynamic",
+    "validate": "prism validate ../openapi.yaml"
+  },
+  "devDependencies": {
+    "@stoplight/prism-cli": "^5.5.0"
+  }
+}
