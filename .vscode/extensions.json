@@ -1,0 +1,35 @@
+{
+  "recommendations": [
+    // Java & Spring Boot必須
+    "vscjava.vscode-java-pack",
+    "vmware.vscode-spring-boot",
+    "vscjava.vscode-spring-boot-dashboard",
+    "vscjava.vscode-spring-initializr",
+    "redhat.java",
+
+    // TypeScript & React
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "dsznajder.es7-react-js-snippets",
+    "styled-components.vscode-styled-components",
+
+    // Git
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+
+    // データベース
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-mysql",
+
+    // API開発
+    "humao.rest-client",
+    "42crunch.vscode-openapi",
+
+    // ユーティリティ
+    "streetsidesoftware.code-spell-checker",
+    "gruntfuggly.todo-tree",
+    "oderwat.indent-rainbow",
+    "christian-kohler.path-intellisense",
+    "formulahendry.auto-rename-tag"
+  ]
+}

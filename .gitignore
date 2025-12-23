@@ -4,7 +4,7 @@ Thumbs.db
 
 # IDE
 .idea/
-.vscode/
+# .vscode/ は設定を共有するためコミットする
 *.iml
 *.iws
 *.ipr
@@ -54,3 +54,7 @@ build/
 *.swp
 *.swo
 *~
+
+# Documentation (generated)
+backend/build/docs/
+frontend/docs/

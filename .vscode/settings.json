@@ -1,0 +1,53 @@
+{
+  // Java Language Server設定
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.project.sourcePaths": [
+    "backend/src/main/java"
+  ],
+  "java.project.outputPath": "backend/build/classes",
+
+  // Spring Boot設定
+  "spring-boot.ls.java.home": "",
+
+  // Gradle設定
+  "java.import.gradle.enabled": true,
+  "java.import.gradle.wrapper.enabled": true,
+  "java.import.gradle.home": "",
+
+  // マルチルートワークスペース対応
+  "java.project.referencedLibraries": [
+    "backend/lib/**/*.jar"
+  ],
+
+  // ファイル除外設定
+  "files.exclude": {
+    "**/.git": false,
+    "**/.gradle": true,
+    "**/build": true,
+    "**/node_modules": true
+  },
+
+  // エディタ設定
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+
+  // 言語別設定
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java",
+    "editor.tabSize": 4
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2
+  },
+
+  // TypeScript設定
+  "typescript.tsdk": "frontend/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

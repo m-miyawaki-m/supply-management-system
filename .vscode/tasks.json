@@ -1,0 +1,199 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Backend: Gradle Build",
+      "type": "shell",
+      "command": "./gradlew",
+      "args": ["build", "--info"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Gradle Clean Build",
+      "type": "shell",
+      "command": "./gradlew",
+      "args": ["clean", "build"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Spring Boot Run",
+      "type": "shell",
+      "command": "./gradlew",
+      "args": ["bootRun"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting SupplyApplication.*$",
+          "endsPattern": "^.*Started SupplyApplication.*$"
+        }
+      }
+    },
+    {
+      "label": "Frontend: npm install",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Vite Dev Server",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "dev"],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "test",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE.*ready in",
+          "endsPattern": "Local:.*http://localhost:5173"
+        }
+      }
+    },
+    {
+      "label": "Mock Server: npm install",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}/mock-server"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Mock Server: Start Prism",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "mock"],
+      "options": {
+        "cwd": "${workspaceFolder}/mock-server"
+      },
+      "group": "test",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Prism",
+          "endsPattern": "Prism is listening on"
+        }
+      }
+    },
+    {
+      "label": "Start All Servers (Mock)",
+      "dependsOn": [
+        "Frontend: Vite Dev Server",
+        "Mock Server: Start Prism"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Start All Servers (Real Backend)",
+      "dependsOn": [
+        "Backend: Spring Boot Run",
+        "Frontend: Vite Dev Server"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Generate JavaDoc",
+      "type": "shell",
+      "command": "./gradlew",
+      "args": ["javadoc"],
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Open JavaDoc",
+      "type": "shell",
+      "command": "xdg-open",
+      "args": ["${workspaceFolder}/backend/build/docs/javadoc/index.html"],
+      "dependsOn": ["Backend: Generate JavaDoc"],
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Generate TypeDoc",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "docs"],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Serve TypeDoc",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "docs:serve"],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Generate All Documentation",
+      "dependsOn": [
+        "Backend: Generate JavaDoc",
+        "Frontend: Generate TypeDoc"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

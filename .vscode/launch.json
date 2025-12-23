@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch Spring Boot - SupplyApplication",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "mainClass": "com.example.supply.SupplyApplication",
+      "projectName": "supply",
+      "args": "",
+      "console": "integratedTerminal",
+      "env": {},
+      "envFile": "${workspaceFolder}/backend/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug Spring Boot - SupplyApplication",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "mainClass": "com.example.supply.SupplyApplication",
+      "projectName": "supply",
+      "args": "",
+      "console": "integratedTerminal",
+      "env": {},
+      "vmArgs": "-Dspring.profiles.active=dev"
+    }
+  ]
+}
