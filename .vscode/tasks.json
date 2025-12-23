@@ -150,18 +150,17 @@
     {
       "label": "Backend: Open JavaDoc",
       "type": "shell",
-      "command": "explorer.exe",
-      "args": ["${workspaceFolder}/backend/build/docs/javadoc/index.html"],
       "dependsOn": ["Backend: Generate JavaDoc"],
       "group": "none",
       "windows": {
-        "command": "explorer.exe"
+        "command": "cmd",
+        "args": ["/c", "start", "${workspaceFolder}/backend/build/docs/javadoc/index.html"]
       },
       "linux": {
-        "command": "sh",
+        "command": "bash",
         "args": [
           "-c",
-          "if command -v explorer.exe &> /dev/null; then explorer.exe '${workspaceFolder}/backend/build/docs/javadoc/index.html'; elif command -v xdg-open &> /dev/null; then xdg-open '${workspaceFolder}/backend/build/docs/javadoc/index.html'; else echo 'No suitable opener found'; fi"
+          "if command -v explorer.exe >/dev/null 2>&1; then explorer.exe ${workspaceFolder}/backend/build/docs/javadoc/index.html; elif command -v xdg-open >/dev/null 2>&1; then xdg-open ${workspaceFolder}/backend/build/docs/javadoc/index.html; else echo No suitable opener found; fi"
         ]
       },
       "osx": {
