@@ -154,14 +154,11 @@
       "group": "none",
       "windows": {
         "command": "cmd",
-        "args": ["/c", "start", "${workspaceFolder}/backend/build/docs/javadoc/index.html"]
+        "args": ["/c", "start", "${workspaceFolder}\\backend\\build\\docs\\javadoc\\index.html"]
       },
       "linux": {
-        "command": "bash",
-        "args": [
-          "-c",
-          "if command -v explorer.exe >/dev/null 2>&1; then explorer.exe ${workspaceFolder}/backend/build/docs/javadoc/index.html; elif command -v xdg-open >/dev/null 2>&1; then xdg-open ${workspaceFolder}/backend/build/docs/javadoc/index.html; else echo No suitable opener found; fi"
-        ]
+        "command": "${workspaceFolder}/.vscode/open-file.sh",
+        "args": ["${workspaceFolder}/backend/build/docs/javadoc/index.html"]
       },
       "osx": {
         "command": "open",
