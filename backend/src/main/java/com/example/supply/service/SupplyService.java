@@ -3,6 +3,7 @@ package com.example.supply.service;
 import com.example.supply.dto.SupplyRequest;
 import com.example.supply.entity.Supply;
 import com.example.supply.mapper.SupplyMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ import java.util.List;
  */
 @Service
 @Transactional
+@Slf4j
 public class SupplyService {
 
     /** 補給品データアクセスマッパー */
@@ -58,7 +60,10 @@ public class SupplyService {
      * @return 補給品のリスト（登録データがない場合は空のリスト）
      */
     public List<Supply> getAllSupplies() {
-        return supplyMapper.findAll();
+        log.debug("Fetching all supplies");
+        List<Supply> supplies = supplyMapper.findAll();
+        log.debug("Found {} supplies", supplies.size());
+        return supplies;
     }
 
     /**
@@ -68,7 +73,14 @@ public class SupplyService {
      * @return 補給品情報、該当するデータが存在しない場合はnull
      */
     public Supply getSupplyById(Long id) {
-        return supplyMapper.findById(id);
+        log.debug("Fetching supply by id: {}", id);
+        Supply supply = supplyMapper.findById(id);
+        if (supply == null) {
+            log.debug("Supply not found: id={}", id);
+        } else {
+            log.debug("Found supply: id={}, name={}", supply.getId(), supply.getName());
+        }
+        return supply;
     }
 
     /**
@@ -81,6 +93,9 @@ public class SupplyService {
      * @return 登録された補給品情報（IDを含む）
      */
     public Supply createSupply(SupplyRequest request) {
+        log.info("Creating supply: name={}, category={}, quantity={}, unitPrice={}",
+                request.getName(), request.getCategory(), request.getQuantity(), request.getUnitPrice());
+
         Supply supply = new Supply();
         supply.setName(request.getName());
         supply.setQuantity(request.getQuantity());
@@ -88,6 +103,7 @@ public class SupplyService {
         supply.setCategory(request.getCategory());
 
         supplyMapper.insert(supply);
+        log.info("Supply created successfully: id={}, name={}", supply.getId(), supply.getName());
         return supply;
     }
 
@@ -102,17 +118,22 @@ public class SupplyService {
      * @throws RuntimeException 指定されたIDの補給品が存在しない場合
      */
     public Supply updateSupply(Long id, SupplyRequest request) {
+        log.info("Updating supply: id={}, name={}, category={}", id, request.getName(), request.getCategory());
+
         Supply supply = supplyMapper.findById(id);
         if (supply == null) {
+            log.warn("Update failed - Supply not found: id={}", id);
             throw new RuntimeException("Supply not found with id: " + id);
         }
 
+        String oldName = supply.getName();
         supply.setName(request.getName());
         supply.setQuantity(request.getQuantity());
         supply.setUnitPrice(request.getUnitPrice());
         supply.setCategory(request.getCategory());
 
         supplyMapper.update(supply);
+        log.info("Supply updated successfully: id={}, oldName={}, newName={}", id, oldName, supply.getName());
         return supply;
     }
 
@@ -123,11 +144,17 @@ public class SupplyService {
      * @throws RuntimeException 指定されたIDの補給品が存在しない場合
      */
     public void deleteSupply(Long id) {
+        log.info("Deleting supply: id={}", id);
+
         Supply supply = supplyMapper.findById(id);
         if (supply == null) {
+            log.warn("Delete failed - Supply not found: id={}", id);
             throw new RuntimeException("Supply not found with id: " + id);
         }
+
+        String name = supply.getName();
         supplyMapper.delete(id);
+        log.info("Supply deleted successfully: id={}, name={}", id, name);
     }
 
     /**
@@ -165,7 +192,9 @@ public class SupplyService {
      * @throws RuntimeException Excelファイルの生成中にIOエラーが発生した場合
      */
     public byte[] exportToExcel() {
+        log.info("Starting Excel export");
         List<Supply> supplies = supplyMapper.findAll();
+        log.debug("Exporting {} supplies to Excel", supplies.size());
 
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -205,9 +234,12 @@ public class SupplyService {
             }
 
             workbook.write(out);
-            return out.toByteArray();
+            byte[] result = out.toByteArray();
+            log.info("Excel export completed successfully: {} bytes", result.length);
+            return result;
 
         } catch (IOException e) {
+            log.error("Excel export failed", e);
             throw new RuntimeException("Failed to export Excel file", e);
         }
     }

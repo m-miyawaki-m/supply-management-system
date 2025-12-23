@@ -5,6 +5,7 @@ import com.example.supply.entity.InventoryTransaction;
 import com.example.supply.entity.Supply;
 import com.example.supply.mapper.InventoryTransactionMapper;
 import com.example.supply.mapper.SupplyMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ import java.util.List;
  */
 @Service
 @Transactional
+@Slf4j
 public class InventoryService {
 
     /** 在庫トランザクションデータアクセスマッパー */
@@ -63,7 +65,10 @@ public class InventoryService {
      * @return 在庫トランザクションのリスト（データがない場合は空のリスト）
      */
     public List<InventoryTransaction> getAllTransactions() {
-        return inventoryTransactionMapper.findAll();
+        log.debug("Fetching all inventory transactions");
+        List<InventoryTransaction> transactions = inventoryTransactionMapper.findAll();
+        log.debug("Found {} transactions", transactions.size());
+        return transactions;
     }
 
     /**
@@ -78,14 +83,23 @@ public class InventoryService {
      * @throws RuntimeException 指定された補給品IDが存在しない場合
      */
     public InventoryTransaction stockIn(InventoryTransactionRequest request) {
+        log.info("Processing stock in: supplyId={}, quantity={}",
+                request.getSupplyId(), request.getQuantity());
+
         // 在庫を増やす
         Supply supply = supplyMapper.findById(request.getSupplyId());
         if (supply == null) {
+            log.error("Stock in failed - Supply not found: id={}", request.getSupplyId());
             throw new RuntimeException("Supply not found with id: " + request.getSupplyId());
         }
 
-        supply.setQuantity(supply.getQuantity() + request.getQuantity());
+        int oldQuantity = supply.getQuantity();
+        int newQuantity = oldQuantity + request.getQuantity();
+        supply.setQuantity(newQuantity);
         supplyMapper.update(supply);
+
+        log.info("Stock quantity updated: supplyId={}, name={}, oldQuantity={}, newQuantity={}",
+                supply.getId(), supply.getName(), oldQuantity, newQuantity);
 
         // トランザクション記録
         InventoryTransaction transaction = new InventoryTransaction();
@@ -95,6 +109,8 @@ public class InventoryService {
         transaction.setNote(request.getNote());
 
         inventoryTransactionMapper.insert(transaction);
+        log.info("Stock in completed: transactionId={}, supplyId={}, quantity={}",
+                transaction.getId(), request.getSupplyId(), request.getQuantity());
         return transaction;
     }
 
@@ -112,18 +128,31 @@ public class InventoryService {
      *                         または在庫数量が不足している場合
      */
     public InventoryTransaction stockOut(InventoryTransactionRequest request) {
+        log.info("Processing stock out: supplyId={}, quantity={}",
+                request.getSupplyId(), request.getQuantity());
+
         // 在庫を減らす
         Supply supply = supplyMapper.findById(request.getSupplyId());
         if (supply == null) {
+            log.error("Stock out failed - Supply not found: id={}", request.getSupplyId());
             throw new RuntimeException("Supply not found with id: " + request.getSupplyId());
         }
 
-        if (supply.getQuantity() < request.getQuantity()) {
-            throw new RuntimeException("Insufficient stock. Available: " + supply.getQuantity());
+        int oldQuantity = supply.getQuantity();
+        int requestedQuantity = request.getQuantity();
+
+        if (oldQuantity < requestedQuantity) {
+            log.warn("Stock out failed - Insufficient stock: supplyId={}, name={}, available={}, requested={}",
+                    supply.getId(), supply.getName(), oldQuantity, requestedQuantity);
+            throw new RuntimeException("Insufficient stock. Available: " + oldQuantity);
         }
 
-        supply.setQuantity(supply.getQuantity() - request.getQuantity());
+        int newQuantity = oldQuantity - requestedQuantity;
+        supply.setQuantity(newQuantity);
         supplyMapper.update(supply);
+
+        log.info("Stock quantity updated: supplyId={}, name={}, oldQuantity={}, newQuantity={}",
+                supply.getId(), supply.getName(), oldQuantity, newQuantity);
 
         // トランザクション記録
         InventoryTransaction transaction = new InventoryTransaction();
@@ -133,6 +162,8 @@ public class InventoryService {
         transaction.setNote(request.getNote());
 
         inventoryTransactionMapper.insert(transaction);
+        log.info("Stock out completed: transactionId={}, supplyId={}, quantity={}",
+                transaction.getId(), request.getSupplyId(), request.getQuantity());
         return transaction;
     }
 
@@ -143,6 +174,9 @@ public class InventoryService {
      * @return 指定された補給品に関連する在庫トランザクションのリスト（データがない場合は空のリスト）
      */
     public List<InventoryTransaction> getTransactionsBySupplyId(Long supplyId) {
-        return inventoryTransactionMapper.findBySupplyId(supplyId);
+        log.debug("Fetching transactions for supplyId: {}", supplyId);
+        List<InventoryTransaction> transactions = inventoryTransactionMapper.findBySupplyId(supplyId);
+        log.debug("Found {} transactions for supplyId: {}", transactions.size(), supplyId);
+        return transactions;
     }
 }

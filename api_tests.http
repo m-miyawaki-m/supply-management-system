@@ -1,0 +1,84 @@
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### -------------------------------------------------------
+### SupplyController (補給品管理)
+### -------------------------------------------------------
+
+### 1. 補給品一覧取得
+GET {{baseUrl}}/api/supplies
+
+### 2. 補給品登録
+# DTOのフィールド名に合わせてJSONを調整してください
+POST {{baseUrl}}/api/supplies
+Content-Type: {{contentType}}
+
+{
+    "name": "コピー用紙 A4",
+    "quantity": 100,
+    "price": 500,
+    "description": "事務用コピー用紙"
+}
+
+### 3. 補給品詳細取得
+# IDは実際のデータに合わせて変更してください
+GET {{baseUrl}}/api/supplies/1
+
+### 4. 補給品更新
+PUT {{baseUrl}}/api/supplies/1
+Content-Type: {{contentType}}
+
+{
+    "name": "コピー用紙 A4 (再生紙)",
+    "quantity": 120,
+    "price": 450,
+    "description": "環境配慮型"
+}
+
+### 5. 補給品削除
+DELETE {{baseUrl}}/api/supplies/1
+
+### 6. Excelエクスポート
+GET {{baseUrl}}/api/supplies/export
+
+
+### -------------------------------------------------------
+### InventoryController (在庫管理)
+### -------------------------------------------------------
+
+### 7. 在庫トランザクション一覧取得
+GET {{baseUrl}}/api/inventory
+
+### 8. 入庫処理 (在庫増加)
+POST {{baseUrl}}/api/inventory/in
+Content-Type: {{contentType}}
+
+{
+    "supplyId": 1,
+    "quantity": 50,
+    "remarks": "定期補充"
+}
+
+### 9. 出庫処理 (在庫減少)
+POST {{baseUrl}}/api/inventory/out
+Content-Type: {{contentType}}
+
+{
+    "supplyId": 1,
+    "quantity": 10,
+    "remarks": "会議資料作成のため"
+}
+
+### 10. 補給品別トランザクション取得
+GET {{baseUrl}}/api/inventory/supply/1
+
+### CSVインポート (参考)
+# REST Clientでファイルアップロードを行う場合の構文例です
+# POST {{baseUrl}}/api/supplies/import
+# Content-Type: multipart/form-data; boundary=boundary
+# 
+# --boundary
+# Content-Disposition: form-data; name="file"; filename="supplies.csv"
+# 
+# < ./supplies.csv
+# --boundary--
